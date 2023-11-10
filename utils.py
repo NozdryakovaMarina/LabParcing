@@ -1,10 +1,10 @@
 import os
 import time
 import shutil
+from typing import List
 
 import requests
 from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 
@@ -14,7 +14,7 @@ def make_folder(name: str) -> None:
         os.mkdir(name)
 
 
-def get_img(name: str, num_img: int) -> list:
+def get_img(name: str, num_img: int) -> List[str]:
     url = F'https://yandex.ru/images/search?text={name}'
     driver = webdriver.Edge()
     driver.get(url=url)
@@ -28,14 +28,15 @@ def get_img(name: str, num_img: int) -> list:
             driver.find_element(By.CLASS_NAME, 'MediaViewer-ButtonNext').click()
             img = driver.find_element(By.CLASS_NAME, 'MMImage-Origin')
             img_l = img.get_attribute('src')
+            links.append(img_l)
         except:
             continue
     driver.quit()
     return links
 
 
-def upload_img(name: str, links: list) -> None:
-    make_folder(F'dataset/{name}')
+def upload_img(name: str, links: List[str]) -> None:
+    make_folder(f"dataset/{name}")
     num_img = 0
     for img_l in links:
             while True:
@@ -43,11 +44,11 @@ def upload_img(name: str, links: list) -> None:
                     time.sleep(3)
                     response = requests.get(img_l, verify=True)
                     if response.status_code == 200:
-                        num_img += 1
-                        with open(str(num_img).zfill(4) +'jpg', 'wb') as f_img:
+                        with open(F'dataset/{name}/{str(num_img).zfill(4)}' +'.jpg', 'wb') as f_img:
                             f_img.write(response.content)
                             print('Excellent')
-                            break
+                        num_img += 1
+                        break
                 except:
                     continue
 
@@ -55,11 +56,10 @@ def upload_img(name: str, links: list) -> None:
 def main() -> None:
     if os.path.isdir("dataset"):
         shutil.rmtree("dataset")
-    
-    num_img = 10
-
+    make_folder('dataset')
     name1 = 'polarbear'
+    name2 = 'brownbear'
+    num_img = 10
     upload_img(name1, get_img(name1, num_img))
-
-    name2 = 'brownbear' 
+    time.sleep(5)
     upload_img(name2, get_img(name2, num_img))
