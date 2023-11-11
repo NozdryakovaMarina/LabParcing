@@ -24,7 +24,7 @@ def get_img(name: str, num_img: int) -> List[str]:
     links = [items]
     for i in range(num_img):
         try:
-            time.sleep(0.5)
+            time.sleep(0.05)
             driver.find_element(By.CLASS_NAME, 'MediaViewer-ButtonNext').click()
             img = driver.find_element(By.CLASS_NAME, 'MMImage-Origin')
             img_l = img.get_attribute('src')
@@ -41,7 +41,7 @@ def upload_img(name: str, links: List[str]) -> None:
     for img_l in links:
             while True:
                 try:
-                    time.sleep(3)
+                    time.sleep(1)
                     response = requests.get(img_l, verify=True)
                     if response.status_code == 200:
                         with open(F'dataset/{name}/{str(num_img).zfill(4)}' +'.jpg', 'wb') as f_img:
@@ -57,9 +57,9 @@ def main() -> None:
     if os.path.isdir("dataset"):
         shutil.rmtree("dataset")
     make_folder('dataset')
-    name1 = 'polarbear'
-    name2 = 'brownbear'
-    num_img = 10
+    name1 = 'polar_bear'
+    name2 = 'brown_bear'
+    num_img = 1100
     upload_img(name1, get_img(name1, num_img))
     time.sleep(5)
     upload_img(name2, get_img(name2, num_img))
